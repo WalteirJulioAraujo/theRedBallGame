@@ -56,12 +56,12 @@
             context.clearRect(0, 0, canvas.width, canvas.height);
         }
 
-        function checkEnemyCollision() {
+        function checkCollision(ball1,ball2) {
             const distance = Math.sqrt(
-                (player.x - enemy.x) ** 2 + (player.y - enemy.y) ** 2
+                (ball1.x - ball2.x) ** 2 + (ball1.y - ball2.y) ** 2
             );
 
-            return distance < player.radius + enemy.radius;
+            return distance < ball1.radius + ball2.radius;
         }
 
         function endGame() {
@@ -89,8 +89,11 @@
             enemy.move();
             friend.move();
 
-            if (checkEnemyCollision()) {
+            if (checkCollision(player,enemy)) {
                 endGame();
+            }
+            if (checkCollision(player,friend)) {
+                friend = new FriendlyBall(0,0);
             }
 
             enemy.bounceOnEdge();
