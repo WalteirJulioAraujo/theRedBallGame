@@ -1,143 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
 
     <style>
-      body {
-        background: #ccc;
-        margin: 0;
-      }
-
-      canvas {
-        cursor: none;
-      }
+        body {
+            background: #ccc;
+            margin: 0;
+        }
     </style>
-  </head>
+</head>
 
-  <body>
-    <canvas
-      id="canvas"
-      onmousemove="onMouseMove(event)"
-      onclick="startGame()"
-    ></canvas>
+<body>
+    <canvas id="canvas" onmousemove="onMouseMove(event)" onclick="startGame()"></canvas>
+
+    <script src="Ball.js" ></script>
+    <script src="Enemy.js"></script>
+    <script src="Player.js"></script>
 
     <script>
-      const screenWidth = window.innerWidth;
-      const screenHeight = window.innerHeight;
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
 
-      const canvas = document.querySelector("#canvas");
-      canvas.width = screenWidth;
-      canvas.height = screenHeight;
-      const context = canvas.getContext("2d");
+        const canvas = document.querySelector("#canvas");
+        canvas.width = screenWidth;
+        canvas.height = screenHeight;
+        const context = canvas.getContext("2d");
 
-      let intervalId;
+        let intervalId;
 
-      let player = {
-        x: screenWidth / 2,
-        y: screenHeight / 2,
-        radius: 100,
-        color: "red",
-      };
+        let player = new Player(screenWidth/2,screenHeight/2);
+        let enemy = new Enemy(0,0);
 
-      let enemy = {
-        x: 0,
-        y: 0,
-        radius: 30,
-        color: "blue",
-        speedX: 10,
-        speedY: 10,
-      };
-
-      function onMouseMove(event) {
-        player.x = event.clientX;
-        player.y = event.clientY;
-      }
-
-      function drawCircle(x, y, radius, color) {
-        context.beginPath();
-        context.fillStyle = color;
-        context.arc(x, y, radius, 0, 2 * Math.PI);
-        context.fill();
-      }
-
-      function clearScreen() {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-      }
-
-      function drawPlayer() {
-        drawCircle(player.x, player.y, player.radius, player.color);
-      }
-
-      function drawEnemy() {
-        drawCircle(enemy.x, enemy.y, enemy.radius, enemy.color);
-      }
-
-      function moveEnemy() {
-        enemy.x += enemy.speedX;
-        enemy.y += enemy.speedY;
-      }
-
-      function checkEnemyCollision() {
-        const distance = Math.sqrt(
-          (player.x - enemy.x) ** 2 + (player.y - enemy.y) ** 2
-        );
-
-        return distance < player.radius + enemy.radius;
-      }
-
-      function bounceEnemyOnEdge() {
-        if (enemy.x < 0 || enemy.x > screenWidth) {
-          enemy.speedX *= -1;
+        function onMouseMove(event) {
+            x = event.clientX;
+            y = event.clientY;
+            player.moveTo(x,y);
         }
 
-        if (enemy.y < 0 || enemy.y > screenHeight) {
-          enemy.speedY *= -1;
-        }
-      }
-
-      function increaseEnemySpeed() {
-        enemy.speedX *= 1.001;
-        enemy.speedY *= 1.001;
-      }
-
-      function endGame() {
-        alert("Fim do jogo!");
-        clearInterval(intervalId);
-      }
-
-      function startGame() {
-        player.x = screenWidth / 2;
-        player.y = screenHeight / 2;
-
-        enemy.x = 0;
-        enemy.y = 0;
-        enemy.speedX = 10;
-        enemy.speedY = 10;
-
-        clearInterval(intervalId);
-        intervalId = setInterval(gameLoop, 1000 / 60);
-      }
-
-      function gameLoop() {
-        clearScreen();
-        moveEnemy();
-
-        if (checkEnemyCollision()) {
-          endGame();
+        function drawCircle(x, y, radius, color) {
+            context.beginPath();
+            context.fillStyle = color;
+            context.arc(x, y, radius, 0, 2 * Math.PI);
+            context.fill();
         }
 
-        bounceEnemyOnEdge();
-        increaseEnemySpeed();
+        function clearScreen() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        }
 
-        drawPlayer();
-        drawEnemy();
-      }
+        function checkEnemyCollision() {
+            const distance = Math.sqrt(
+                (player.x - enemy.x) ** 2 + (player.y - enemy.y) ** 2
+            );
 
-      startGame();
+            return distance < player.radius + enemy.radius;
+        }
+
+        function endGame() {
+            alert("Fim do jogo!");
+            clearInterval(intervalId);
+        }
+
+        function startGame() {
+            player = new Player(screenWidth/2,screenHeight/2);
+            enemy = new Enemy(0,0);
+
+            const fps = 1000/60;
+
+            clearInterval(intervalId);
+            intervalId = setInterval(gameLoop, fps);
+        }
+
+        function gameLoop() {
+            updateState();
+            renderGame();
+        }   
+
+        function updateState(){
+            enemy.move();
+
+            if (checkEnemyCollision()) {
+                endGame();
+            }
+
+            enemy.bounceOnEdge();
+            enemy.increaseSpeed();
+        }
+
+        function renderGame(){
+            clearScreen();
+            player.draw();
+            enemy.draw();
+        }
+
+        startGame();
     </script>
-  </body>
+</body>
+
 </html>
