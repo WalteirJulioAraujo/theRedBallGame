@@ -11,13 +11,37 @@
         body {
             background: #ccc;
             margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+        .scoreboard{
+            width: 200px;
+            height: 50px;
+            font-size: 50px;
+            color: white;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            flex-wrap:wrap;
+            z-index: 3;
+        }
+        .scoreboard .name{
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        canvas{
+            position: absolute;
         }
     </style>
 </head>
 
 <body>
-    <canvas id="canvas" onmousemove="onMouseMove(event)" onclick="startGame()"></canvas>
-
+    <canvas id="canvas" onmousemove="onMouseMove(event)" onclick="startGame()">sdsdsd</canvas>
+    <div class="scoreboard">
+        <div class="name">Pontuação</div>
+        <div class="score">0</div>
+    </div>
     <script src="Ball.js"></script>
     <script src="AutomaticBall.js"></script>
     <script src="Enemy.js"></script>
@@ -33,10 +57,19 @@
         canvas.height = screenHeight;
         const context = canvas.getContext("2d");
 
+        const score = document.querySelector(".score");
+
+        function updateScore(value){
+            let oldScore = Number(score.innerHTML);
+            let newScore = oldScore + value;
+            score.innerHTML = newScore;
+        }
+
         let intervalId;
         let newEnemies;
         let newFriends;
         let newBallId;
+        let scoreId;
 
         let player = new Player(screenWidth / 2, screenHeight / 2);
         let enemies = [];
@@ -79,34 +112,26 @@
             return {x,y};
         }
 
-        // function newEnemy(){
-        //     const position = generatesRandomPosition();
-        //     const newEnemy = new Enemy(position.x,position.y);
-        //     enemies.push(newEnemy);
-        // }
-
-        // function newFriend(){
-        //     const position = generatesRandomPosition()
-        //     const newFriend = new FriendlyBall(position.x,position.y);
-        //     friends.push(newFriend);
-        // }
-
         function newBall(){
             const position = generatesRandomPosition();
             const probability = Math.random();
-            if(probability < 0.6){
+            if(probability < 0.8){
                 const newEnemy = new Enemy(position.x,position.y);
                 enemies.push(newEnemy);
-            }else{
+            }
+            if(probability<0.6){
                 const newFriend = new FriendlyBall(position.x,position.y);
                 friends.push(newFriend);
             }
         }
 
         function endGame() {
-            alert("Fim do jogo!");
             clearInterval(intervalId);
             clearInterval(newBallId);
+            clearInterval(scoreId);
+            setTimeout(()=>{
+                alert(`Fim do jogo, sua pontuação foi ${score.innerHTML}!`);
+            },300);
         }
 
         function startGame() {
@@ -120,12 +145,16 @@
 
             clearInterval(intervalId);
             clearInterval(newBallId);
+            clearInterval(scoreId);
 
             const fps = 1000 / 60;
             intervalId = setInterval(gameLoop, fps);
 
             const timeForANewBall = 2000;
             newBallId = setInterval(newBall,timeForANewBall);
+
+            const timeForUpdateScore = 1000;
+            scoreId = setInterval(updateScore,timeForUpdateScore,1);
         }
 
         function gameLoop() {
@@ -148,7 +177,7 @@
                 const isFriendOutScreen = friend.x > screenWidth || friend.y > screenHeight || friend.x < 0 || friend.y < 0;
 
                 if(friendlyCollision){
-                    console.log("friendlyCollision");
+                    updateScore(10);
                 }
 
                 const deleteBall = friendlyCollision || isFriendOutScreen;
@@ -179,7 +208,7 @@
             })
         }
 
-        startGame();
+        //startGame();
     </script>
 </body>
 
