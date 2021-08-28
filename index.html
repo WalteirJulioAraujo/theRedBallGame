@@ -36,6 +36,7 @@
         let intervalId;
         let newEnemies;
         let newFriends;
+        let newBallId;
 
         let player = new Player(screenWidth / 2, screenHeight / 2);
         let enemies = [];
@@ -78,23 +79,34 @@
             return {x,y};
         }
 
-        function newEnemy(){
-            const position = generatesRandomPosition();
-            const newEnemy = new Enemy(position.x,position.y);
-            enemies.push(newEnemy);
-        }
+        // function newEnemy(){
+        //     const position = generatesRandomPosition();
+        //     const newEnemy = new Enemy(position.x,position.y);
+        //     enemies.push(newEnemy);
+        // }
 
-        function newFriend(){
-            const position = generatesRandomPosition()
-            const newFriend = new FriendlyBall(position.x,position.y);
-            friends.push(newFriend);
+        // function newFriend(){
+        //     const position = generatesRandomPosition()
+        //     const newFriend = new FriendlyBall(position.x,position.y);
+        //     friends.push(newFriend);
+        // }
+
+        function newBall(){
+            const position = generatesRandomPosition();
+            const probability = Math.random();
+            if(probability < 0.6){
+                const newEnemy = new Enemy(position.x,position.y);
+                enemies.push(newEnemy);
+            }else{
+                const newFriend = new FriendlyBall(position.x,position.y);
+                friends.push(newFriend);
+            }
         }
 
         function endGame() {
             alert("Fim do jogo!");
             clearInterval(intervalId);
-            clearInterval(newEnemies);
-            clearInterval(newFriends);
+            clearInterval(newBallId);
         }
 
         function startGame() {
@@ -107,17 +119,13 @@
             friends = [friend];
 
             clearInterval(intervalId);
-            clearInterval(newEnemies);
-            clearInterval(newFriends);
+            clearInterval(newBallId);
 
             const fps = 1000 / 60;
             intervalId = setInterval(gameLoop, fps);
 
-            const timeForANewEnemy = 4000;
-            newEnemies = setInterval(newEnemy,timeForANewEnemy);
-
-            const timeForANewFriend = 3000;
-            newFriends = setInterval(newFriend,timeForANewFriend);
+            const timeForANewBall = 2000;
+            newBallId = setInterval(newBall,timeForANewBall);
         }
 
         function gameLoop() {
