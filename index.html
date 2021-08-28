@@ -18,8 +18,8 @@
 <body>
     <canvas id="canvas" onmousemove="onMouseMove(event)" onclick="startGame()"></canvas>
 
-    <script src="Ball.js" ></script>
-    <script src="AutomaticBall.js" ></script>
+    <script src="Ball.js"></script>
+    <script src="AutomaticBall.js"></script>
     <script src="Enemy.js"></script>
     <script src="Player.js"></script>
     <script src="FriendlyBall.js"></script>
@@ -34,15 +34,19 @@
         const context = canvas.getContext("2d");
 
         let intervalId;
+        let checkMemoryLeak;
 
-        let player = new Player(screenWidth/2,screenHeight/2);
-        let enemy = new Enemy(0,0);
-        let friend = new FriendlyBall(0,0);
+        let player = new Player(screenWidth / 2, screenHeight / 2);
+        let enemy = new Enemy(0, 0);
+        let friend = new FriendlyBall(0, 0);
+
+        let enemys = [enemy];
+        let friends = [friend];
 
         function onMouseMove(event) {
             x = event.clientX;
             y = event.clientY;
-            player.moveTo(x,y);
+            player.moveTo(x, y);
         }
 
         function drawCircle(x, y, radius, color) {
@@ -56,7 +60,7 @@
             context.clearRect(0, 0, canvas.width, canvas.height);
         }
 
-        function checkCollision(ball1,ball2) {
+        function checkCollision(ball1, ball2) {
             const distance = Math.sqrt(
                 (ball1.x - ball2.x) ** 2 + (ball1.y - ball2.y) ** 2
             );
@@ -67,44 +71,76 @@
         function endGame() {
             alert("Fim do jogo!");
             clearInterval(intervalId);
+            clearInterval(checkMemoryLeak);
         }
 
         function startGame() {
-            player = new Player(screenWidth/2,screenHeight/2);
-            enemy = new Enemy(0,0);
-            friend = new FriendlyBall(0,0);
 
-            const fps = 1000/60;
+            player.moveTo(screenWidth / 2, screenHeight / 2);
+            enemy = new Enemy(0, 0);
+            friend = new FriendlyBall(0, 0);
+            enemys = [enemy];
+            friends = [friend];
+
+            const fps = 1000 / 60;
 
             clearInterval(intervalId);
+            clearInterval(checkMemoryLeak);
             intervalId = setInterval(gameLoop, fps);
+            checkMemoryLeak = setInterval(() => {
+                console.log(friends)
+            }, 1000);
         }
 
         function gameLoop() {
             updateState();
             renderGame();
-        }   
-
-        function updateState(){
-            enemy.move();
-            friend.move();
-
-            if (checkCollision(player,enemy)) {
-                endGame();
-            }
-            if (checkCollision(player,friend)) {
-                friend = new FriendlyBall(0,0);
-            }
-
-            enemy.bounceOnEdge();
-            enemy.increaseSpeed();
         }
 
-        function renderGame(){
+        function updateState() {
+            enemys.forEach((enemy) => {
+                enemy.move();
+            })
+
+            friends.forEach((friend) => {
+                friend.move();
+            })
+
+            enemys.forEach((enemy) => {
+                if (checkCollision(player, enemy)) {
+                    endGame();
+                };
+            })
+
+            friends = friends.filter((friend) => {
+                return !checkCollision(player, friend);
+            })
+
+            friends = friends.filter((friend) => {
+                const isFriendOutScreen = friend.x > screenWidth || friend.y > screenHeight || friend.x < 0 || friend.y < 0;
+                return !isFriendOutScreen;
+            })
+
+            enemys.forEach((enemy) => {
+                enemy.bounceOnEdge();
+            })
+
+            enemys.forEach((enemy) => {
+                enemy.increaseSpeed();
+            })
+        }
+
+        function renderGame() {
             clearScreen();
             player.draw();
-            enemy.draw();
-            friend.draw();
+
+            enemys.forEach((enemy) => {
+                enemy.draw();
+            })
+
+            friends.forEach((friend) => {
+                friend.draw();
+            })
         }
 
         startGame();
