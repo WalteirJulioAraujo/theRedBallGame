@@ -5,7 +5,7 @@ class Enemy extends AutomaticBall{
     speedY = 10;
 
     constructor(initialX,initialY){
-        super(initialX,initialY,"blue",30);
+        super(initialX,initialY,"blue",25);
     }
 
     bounceOnEdge(){
@@ -19,7 +19,7 @@ class Enemy extends AutomaticBall{
     }
     
     increaseSpeed(){
-        this.speedX *= 1.001;
-        this.speedY *= 1.001;
+        this.speedX *= 1.0008;
+        this.speedY *= 1.0008;
     }
 }
