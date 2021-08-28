@@ -34,14 +34,14 @@
         const context = canvas.getContext("2d");
 
         let intervalId;
-        let newEnemys;
+        let newEnemies;
         let newFriends;
 
         let player = new Player(screenWidth / 2, screenHeight / 2);
         let enemy = new Enemy(0, 0);
         let friend = new FriendlyBall(0, 0);
 
-        let enemys = [enemy];
+        let enemies = [enemy];
         let friends = [friend];
 
         function onMouseMove(event) {
@@ -71,7 +71,7 @@
 
         function newEnemy(){
             const newEnemy = new Enemy(0,0);
-            enemys.push(newEnemy);
+            enemies.push(newEnemy);
         }
 
         function newFriend(){
@@ -83,7 +83,7 @@
             alert("Fim do jogo!");
             clearInterval(intervalId);
             clearInterval(intervalId);
-            clearInterval(newEnemys);
+            clearInterval(newEnemies);
             clearInterval(newFriends);
         }
 
@@ -92,18 +92,18 @@
             player.moveTo(screenWidth / 2, screenHeight / 2);
             enemy = new Enemy(0, 0);
             friend = new FriendlyBall(0, 0);
-            enemys = [enemy];
+            enemies = [enemy];
             friends = [friend];
 
             clearInterval(intervalId);
-            clearInterval(newEnemys);
+            clearInterval(newEnemies);
             clearInterval(newFriends);
 
             const fps = 1000 / 60;
             intervalId = setInterval(gameLoop, fps);
 
             const timeForANewEnemy = 3000;
-            newEnemys = setInterval(newEnemy,timeForANewEnemy);
+            newEnemies = setInterval(newEnemy,timeForANewEnemy);
 
             const timeForANewFriend = 2000;
             newFriends = setInterval(newFriend,timeForANewFriend);
@@ -115,34 +115,34 @@
         }
 
         function updateState() {
-            enemys.forEach((enemy) => {
+            enemies.forEach((enemy) => {
                 enemy.move();
-            })
 
-            friends.forEach((friend) => {
-                friend.move();
-            })
-
-            enemys.forEach((enemy) => {
                 if (checkCollision(player, enemy)) {
                     endGame();
                 };
             })
 
             friends = friends.filter((friend) => {
-                return !checkCollision(player, friend);
-            })
-
-            friends = friends.filter((friend) => {
+                friend.move();
+                const friendlyCollision = checkCollision(player, friend);
                 const isFriendOutScreen = friend.x > screenWidth || friend.y > screenHeight || friend.x < 0 || friend.y < 0;
-                return !isFriendOutScreen;
+
+                if(friendlyCollision){
+                    console.log("friendlyCollision");
+                }
+
+                const deleteBall = friendlyCollision || isFriendOutScreen;
+
+                return !deleteBall;
+
             })
 
-            enemys.forEach((enemy) => {
+            enemies.forEach((enemy) => {
                 enemy.bounceOnEdge();
             })
 
-            enemys.forEach((enemy) => {
+            enemies.forEach((enemy) => {
                 enemy.increaseSpeed();
             })
         }
@@ -151,7 +151,7 @@
             clearScreen();
             player.draw();
 
-            enemys.forEach((enemy) => {
+            enemies.forEach((enemy) => {
                 enemy.draw();
             })
 
