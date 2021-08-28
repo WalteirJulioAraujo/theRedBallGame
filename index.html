@@ -34,7 +34,8 @@
         const context = canvas.getContext("2d");
 
         let intervalId;
-        let checkMemoryLeak;
+        let newEnemys;
+        let newFriends;
 
         let player = new Player(screenWidth / 2, screenHeight / 2);
         let enemy = new Enemy(0, 0);
@@ -68,10 +69,22 @@
             return distance < ball1.radius + ball2.radius;
         }
 
+        function newEnemy(){
+            const newEnemy = new Enemy(0,0);
+            enemys.push(newEnemy);
+        }
+
+        function newFriend(){
+            const newFriend = new FriendlyBall(0,0);
+            friends.push(newFriend);
+        }
+
         function endGame() {
             alert("Fim do jogo!");
             clearInterval(intervalId);
-            clearInterval(checkMemoryLeak);
+            clearInterval(intervalId);
+            clearInterval(newEnemys);
+            clearInterval(newFriends);
         }
 
         function startGame() {
@@ -82,14 +95,18 @@
             enemys = [enemy];
             friends = [friend];
 
-            const fps = 1000 / 60;
-
             clearInterval(intervalId);
-            clearInterval(checkMemoryLeak);
+            clearInterval(newEnemys);
+            clearInterval(newFriends);
+
+            const fps = 1000 / 60;
             intervalId = setInterval(gameLoop, fps);
-            checkMemoryLeak = setInterval(() => {
-                console.log(friends)
-            }, 1000);
+
+            const timeForANewEnemy = 3000;
+            newEnemys = setInterval(newEnemy,timeForANewEnemy);
+
+            const timeForANewFriend = 2000;
+            newFriends = setInterval(newFriend,timeForANewFriend);
         }
 
         function gameLoop() {

@@ -3,7 +3,7 @@
 class Player extends Ball{
 
     constructor(initialX,initialY){
-        super(initialX,initialY,"red",100);
+        super(initialX,initialY,"red",60);
     }
 
     moveTo(x,y){
