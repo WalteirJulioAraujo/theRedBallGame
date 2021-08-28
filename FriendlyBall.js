@@ -1,6 +1,6 @@
 class FriendlyBall extends AutomaticBall{
-    speedX = 8;
-    speedY = 8;
+    speedX = 5;
+    speedY = 5;
 
     constructor(initialX,initialY){
         super(initialX,initialY,"green",20);

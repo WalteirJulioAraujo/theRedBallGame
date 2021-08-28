@@ -22,6 +22,7 @@
     <script src="AutomaticBall.js" ></script>
     <script src="Enemy.js"></script>
     <script src="Player.js"></script>
+    <script src="FriendlyBall.js"></script>
 
     <script>
         const screenWidth = window.innerWidth;
@@ -36,6 +37,7 @@
 
         let player = new Player(screenWidth/2,screenHeight/2);
         let enemy = new Enemy(0,0);
+        let friend = new FriendlyBall(0,0);
 
         function onMouseMove(event) {
             x = event.clientX;
@@ -70,6 +72,7 @@
         function startGame() {
             player = new Player(screenWidth/2,screenHeight/2);
             enemy = new Enemy(0,0);
+            friend = new FriendlyBall(0,0);
 
             const fps = 1000/60;
 
@@ -84,6 +87,7 @@
 
         function updateState(){
             enemy.move();
+            friend.move();
 
             if (checkEnemyCollision()) {
                 endGame();
@@ -97,6 +101,7 @@
             clearScreen();
             player.draw();
             enemy.draw();
+            friend.draw();
         }
 
         startGame();
